@@ -1,5 +1,3 @@
-// home.pug
-
 doctype html
 html(lang="en")
   head
@@ -12,12 +10,14 @@ html(lang="en")
     header
       h1 Chat Service
     main
-      form#nickname 
-        input(type="text", placeholder="Please set your nickname", required)
-        button Save
-      ul
-      form#message
-        input(type="text", placeholder="Please write a message", required)
-        button Send
+      div#room
+        form
+          input(type="text", placeholder="Type a room name", required)
+          button Enter the Room
+      div#chat
+        h2 Room Name
+        form
+          input(type="text", placeholder="Input your message", required)
+          button Send
     script(src="/socket.io/socket.io.js") 
     script(src="/public/js/app.js")
