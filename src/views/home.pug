@@ -8,7 +8,12 @@ html(lang="en")
     meta(name="viewport", content="width=device-width, initial-scale=1.0")
     link(rel="stylesheet", href="https://unpkg.com/mvp.css")
     title Zoom
-  body 
-  h1 Chat Service
-  button Call
-  script(src="/public/js/app.js")
+  body
+    header
+      h1 Chat Service
+    main
+      ul
+      form
+        input(type="text", placeholder="Please write a message", required)
+        button Send
+    script(src="/public/js/app.js")
