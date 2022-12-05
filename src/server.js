@@ -13,15 +13,28 @@ app.get("/", (req, res) => res.render("home"));
 const server = http.createServer(app);
 const webSocketServer = new WebSocket.Server({ server });
 
-const sockets = []; // sockets 배열 생성
+const sockets = [];
 
 webSocketServer.on("connection", (socket) => {
-  sockets.push(socket); // 각 socket을 배열에 추가해주기
-  console.log("Connected to Browser.");
+  sockets.push(socket);
+  socket["nickName"] = "Anonymous"; // 연결 시 닉네임 미설정이라면 기본값 부여
   socket.on("open", () => console.log("Connected to the Browser"));
   socket.on("message", (message) => {
-    sockets.forEach((eachSocket) => eachSocket.send(message.toString()));
-  }); // 각 소켓으로부터 수신한 메시지를 에코잉해주기
+    message = JSON.parse(message);
+
+    // 메시지 유형을 구분해주기
+    switch (message.type) {
+      case "newMessage":
+        sockets.forEach((eachSocket) =>
+          eachSocket.send(`${socket.nickName}: ${message.payload.toString()}`)
+        );
+        break;
+      case "nickName": // 닉네임 설정하기
+        socket["nickName"] = message.payload;
+        console.log(message.payload);
+        break;
+    }
+  });
   socket.on("close", () => console.log("Disconnectd from the Browser"));
 });
 

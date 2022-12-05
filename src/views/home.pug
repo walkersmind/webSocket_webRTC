@@ -12,8 +12,11 @@ html(lang="en")
     header
       h1 Chat Service
     main
+      form#nickname 
+        input(type="text", placeholder="Please set your nickname", required)
+        button Save
       ul
-      form
+      form#message
         input(type="text", placeholder="Please write a message", required)
         button Send
     script(src="/public/js/app.js")
