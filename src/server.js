@@ -20,15 +20,26 @@ ioServer.on("connection", (socket) => {
   });
   socket.on("room", (roomName, showRoom) => {
     socket.join(roomName);
-    showRoom();
-    socket.to(roomName).emit("greeting");
-    socket.on("message", (message, sendMessage) => {
-      message = `${socket.id}: ${message}`;
-      socket.to(roomName).emit("sendMessage", message, sendMessage(message));
+    showRoom(roomName);
+    // 환영 메시지에 닉네임 추가
+    socket.to(roomName).emit("greeting", socket["nickname"]);
+    // 메시지 옆에 닉네임 추가
+    socket.on("message", (message, addMessage) => {
+      message = `${socket["nickname"]}: ${message}`;
+      socket.to(roomName).emit("sendMessage", message, addMessage(message));
     });
   });
+  // 퇴장 메시지에 닉네임 추가
   socket.on("disconnecting", () => {
-    socket.rooms.forEach((room) => socket.to(room).emit("goodbye"));
+    socket.rooms.forEach((room) =>
+      socket.to(room).emit("goodbye", socket["nickname"])
+    );
+  });
+  // 닉네임 설정 이벤트 처리
+  socket.on("nickname", (nickname, saveNickname) => {
+    socket["nickname"] = nickname;
+    console.log(`설정한 닉네임: ${socket["nickname"]}`);
+    saveNickname(nickname);
   });
 });
 
