@@ -5,13 +5,13 @@ let roomName = room.querySelector("form");
 const chat = document.querySelector("#chat");
 const chatting = chat.querySelector("form");
 
-chat.hidden = true; // 처음에 채팅 창 가려주기
+chat.hidden = true;
 
 const showRoom = (userRoomName) => {
-  room.hidden = true; // 방 이름 입력창 가려주기
-  chat.hidden = false; // 채팅창 보여주기
+  room.hidden = true;
+  chat.hidden = false;
 
-  const roomNameHeader = chat.querySelector("h2"); // 입장한 방 이름 보여주기
+  const roomNameHeader = chat.querySelector("h2");
   roomNameHeader.innerText = `Room: ${roomName}`;
 };
 
@@ -21,7 +21,23 @@ function handleRoomName(event) {
   const input = roomName.querySelector("input");
   roomName = input.value;
 
-  socket.emit("room", { payload: input.value }, showRoom);
+  socket.emit("room", roomName, showRoom);
 }
 
 roomName.addEventListener("submit", handleRoomName);
+
+function sendMessage(message) {
+  const ul = chat.querySelector("ul");
+  const li = document.createElement("li");
+
+  li.innerText = message;
+  ul.appendChild(li);
+}
+
+socket.on("greeting", () => {
+  sendMessage("Someone has joined!");
+});
+
+socket.on("goodbye", () => {
+  sendMessage("Someone has left.");
+});
