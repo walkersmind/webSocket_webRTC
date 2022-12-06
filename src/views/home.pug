@@ -10,15 +10,20 @@ html(lang="en")
     header
       h1 Chat Service
     main
+      div#nickname
+        form
+          input(type="text", placeholder="Please enter your nickname", required, autofocus)
+          button Save
       div#room
         form
-          input(type="text", placeholder="Type a room name", required)
+          input(type="text", placeholder="Please type Room name", required)
           button Enter the Room
       div#chat
         h2 Room Name
         ul
         form
-          input(type="text", placeholder="Input your message", required)
+          input(type="text", placeholder="You can type here", required)
           button Send
     script(src="/socket.io/socket.io.js") 
     script(src="/public/js/app.js")
+    

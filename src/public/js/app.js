@@ -1,9 +1,11 @@
 const socket = io();
 
 const room = document.querySelector("#room");
-let roomName = room.querySelector("form");
+const roomForm = room.querySelector("form");
 const chat = document.querySelector("#chat");
-const chatting = chat.querySelector("form");
+const chatForm = chat.querySelector("form");
+const nicknameSet = document.querySelector("#nickname");
+const nicknameForm = nickname.querySelector("form");
 
 function sendMessage(message) {
   const ul = chat.querySelector("ul");
@@ -15,48 +17,67 @@ function sendMessage(message) {
 function handleSendMessage(event) {
   event.preventDefault();
 
-  const message = chatting.querySelector("input");
+  const message = chatForm.querySelector("input");
   socket.emit("message", message.value, sendMessage);
   message.value = "";
 }
 
+room.hidden = true;
 chat.hidden = true;
 
-const showRoom = (userRoomName) => {
+function showRoom(roomName) {
+  // 로직 흐름에 따라 상황에 맞는 div 표시해주기
   room.hidden = true;
+  nicknameSet.hidden = true;
   chat.hidden = false;
 
   const roomNameHeader = chat.querySelector("h2");
   roomNameHeader.innerText = `Room: ${roomName}`;
 
-  chatting.addEventListener("submit", handleSendMessage);
-};
+  chatForm.querySelector("input").focus();
+
+  chatForm.addEventListener("submit", handleSendMessage);
+}
 
 function handleRoomName(event) {
   event.preventDefault();
 
-  const input = roomName.querySelector("input");
-  roomName = input.value;
+  const input = roomForm.querySelector("input");
+  const roomName = input.value;
 
   socket.emit("room", roomName, showRoom);
 }
 
-roomName.addEventListener("submit", handleRoomName);
+// 닉네임 저장하기
+function saveNickname(nickname) {
+  room.hidden = false;
+  nicknameSet.hidden = true;
+  chat.hidden = true;
 
-function sendMessage(message) {
-  const ul = chat.querySelector("ul");
-  const li = document.createElement("li");
+  roomForm.querySelector("input").focus();
 
-  li.innerText = message;
-  ul.appendChild(li);
+  // 채팅방 이름에 이벤트 리스너 추가
+  roomForm.addEventListener("submit", handleRoomName);
 }
 
-socket.on("greeting", () => {
-  sendMessage("Someone has joined!");
+// 닉네임 버튼 핸들러
+function handleNickName(event) {
+  event.preventDefault();
+
+  const input = nicknameForm.querySelector("input");
+  const nickname = input.value;
+
+  socket.emit("nickname", nickname, saveNickname);
+}
+
+nicknameForm.addEventListener("submit", handleNickName);
+
+socket.on("greeting", (nickname) => {
+  sendMessage(`${nickname} has joined!`);
 });
 
-socket.on("goodbye", () => {
-  sendMessage("Someone has left.");
+socket.on("goodbye", (nickname) => {
+  sendMessage(`${nickname} has left!`);
 });
 
 socket.on("sendMessage", sendMessage);
