@@ -8,14 +8,20 @@ html(lang="en")
     title Zoom
   body
     header
-      h1 Chat Service
+      h1 Let's Chat Together!
     main
+      div#openPublicRoom
+        h2 Available Rooms
+        ul
+          li 🚪
       div#nickname
         form
-          input(type="text", placeholder="Please enter your nickname", required, autofocus)
+          h2 Set a Nickname
+          input(type="text", placeholder="Please enter your nicknamee", required, autofocus)
           button Save
       div#room
         form
+          h2 Enter a Room
           input(type="text", placeholder="Please type Room name", required)
           button Enter the Room
       div#chat
@@ -24,6 +30,6 @@ html(lang="en")
         form
           input(type="text", placeholder="You can type here", required)
           button Send
+
     script(src="/socket.io/socket.io.js") 
     script(src="/public/js/app.js")
-    

@@ -6,6 +6,8 @@ const chat = document.querySelector("#chat");
 const chatForm = chat.querySelector("form");
 const nicknameSet = document.querySelector("#nickname");
 const nicknameForm = nickname.querySelector("form");
+const openPublicRoom = document.querySelector("#openPublicRoom");
+const openPublicRoomList = openPublicRoom.querySelector("ul");
 
 function sendMessage(message) {
   const ul = chat.querySelector("ul");
@@ -24,12 +26,13 @@ function handleSendMessage(event) {
 
 room.hidden = true;
 chat.hidden = true;
+openPublicRoom.hidden = true;
 
 function showRoom(roomName) {
-  // 로직 흐름에 따라 상황에 맞는 div 표시해주기
   room.hidden = true;
   nicknameSet.hidden = true;
   chat.hidden = false;
+  openPublicRoom.hidden = false;
 
   const roomNameHeader = chat.querySelector("h2");
   roomNameHeader.innerText = `Room: ${roomName}`;
@@ -48,7 +51,6 @@ function handleRoomName(event) {
   socket.emit("room", roomName, showRoom);
 }
 
-// 닉네임 저장하기
 function saveNickname(nickname) {
   room.hidden = false;
   nicknameSet.hidden = true;
@@ -56,11 +58,9 @@ function saveNickname(nickname) {
 
   roomForm.querySelector("input").focus();
 
-  // 채팅방 이름에 이벤트 리스너 추가
   roomForm.addEventListener("submit", handleRoomName);
 }
 
-// 닉네임 버튼 핸들러
 function handleNickName(event) {
   event.preventDefault();
 
@@ -81,3 +81,9 @@ socket.on("goodbye", (nickname) => {
 });
 
 socket.on("sendMessage", sendMessage);
+
+// 방 변경 사항 받기
+socket.on("roomUpdate", (rooms) => {
+  const li = openPublicRoomList.querySelector("li");
+  li.innerText = `🚪 ${rooms}`;
+});
