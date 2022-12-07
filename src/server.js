@@ -1,6 +1,7 @@
 import http from "http";
 import { Server } from "socket.io";
 import express from "express";
+import { instrument } from "@socket.io/admin-ui";
 
 const app = express();
 
@@ -12,7 +13,34 @@ app.get("/", (_, res) => res.render("home"));
 app.get("/*", (_, res) => res.redirect("/"));
 
 const httpServer = http.createServer(app);
-const ioServer = new Server(httpServer);
+const ioServer = new Server(httpServer, {
+  cors: {
+    origin: "https://admin.socket.io",
+    credentials: true,
+  },
+});
+
+instrument(ioServer, {
+  auth: false,
+});
+
+function updatePublicRoom() {
+  const {
+    sockets: {
+      adapter: { rooms, sids },
+    },
+  } = ioServer;
+
+  let publicRooms = [];
+
+  rooms.forEach((_, key) => {
+    if (sids.get(key) === undefined) {
+      publicRooms.push(key);
+    }
+  });
+
+  return publicRooms;
+}
 
 ioServer.on("connection", (socket) => {
   socket.onAny((event) => {
@@ -21,21 +49,23 @@ ioServer.on("connection", (socket) => {
   socket.on("room", (roomName, showRoom) => {
     socket.join(roomName);
     showRoom(roomName);
-    // 환영 메시지에 닉네임 추가
+    console.log(socket.rooms);
     socket.to(roomName).emit("greeting", socket["nickname"]);
-    // 메시지 옆에 닉네임 추가
-    socket.on("message", (message, addMessage) => {
+    ioServer.sockets.emit("roomUpdate", updatePublicRoom());
+
+    socket.on("message", (message, sendMessage) => {
       message = `${socket["nickname"]}: ${message}`;
-      socket.to(roomName).emit("sendMessage", message, addMessage(message));
+      socket.to(roomName).emit("sendMessage", message, sendMessage(message));
     });
   });
-  // 퇴장 메시지에 닉네임 추가
+
   socket.on("disconnecting", () => {
     socket.rooms.forEach((room) =>
       socket.to(room).emit("goodbye", socket["nickname"])
     );
+    ioServer.sockets.emit("roomUpdate", updatePublicRoom());
   });
-  // 닉네임 설정 이벤트 처리
+
   socket.on("nickname", (nickname, saveNickname) => {
     socket["nickname"] = nickname;
     console.log(`설정한 닉네임: ${socket["nickname"]}`);
