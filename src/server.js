@@ -1,6 +1,7 @@
 import http from "http";
 import { Server } from "socket.io";
 import express from "express";
+import { instrument } from "@socket.io/admin-ui";
 
 const app = express();
 
@@ -12,9 +13,17 @@ app.get("/", (_, res) => res.render("home"));
 app.get("/*", (_, res) => res.redirect("/"));
 
 const httpServer = http.createServer(app);
-const ioServer = new Server(httpServer);
+const ioServer = new Server(httpServer, {
+  cors: {
+    origin: "https://admin.socket.io",
+    credentials: true,
+  },
+});
 
-// 공개 방 업데이트 로직
+instrument(ioServer, {
+  auth: false,
+});
+
 function updatePublicRoom() {
   const {
     sockets: {
@@ -42,7 +51,7 @@ ioServer.on("connection", (socket) => {
     showRoom(roomName);
     console.log(socket.rooms);
     socket.to(roomName).emit("greeting", socket["nickname"]);
-    ioServer.sockets.emit("roomUpdate", updatePublicRoom()); // 입장하며 방에 업데이트하기
+    ioServer.sockets.emit("roomUpdate", updatePublicRoom());
 
     socket.on("message", (message, sendMessage) => {
       message = `${socket["nickname"]}: ${message}`;
@@ -54,7 +63,7 @@ ioServer.on("connection", (socket) => {
     socket.rooms.forEach((room) =>
       socket.to(room).emit("goodbye", socket["nickname"])
     );
-    ioServer.sockets.emit("roomUpdate", updatePublicRoom()); // 퇴장하며 방에 업데이트하기
+    ioServer.sockets.emit("roomUpdate", updatePublicRoom());
   });
 
   socket.on("nickname", (nickname, saveNickname) => {
