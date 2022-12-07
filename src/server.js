@@ -49,7 +49,6 @@ ioServer.on("connection", (socket) => {
   socket.on("room", (roomName, showRoom) => {
     socket.join(roomName);
     showRoom(roomName);
-    console.log(socket.rooms);
     socket.to(roomName).emit("greeting", socket["nickname"]);
     ioServer.sockets.emit("roomUpdate", updatePublicRoom());
 
@@ -68,7 +67,6 @@ ioServer.on("connection", (socket) => {
 
   socket.on("nickname", (nickname, saveNickname) => {
     socket["nickname"] = nickname;
-    console.log(`설정한 닉네임: ${socket["nickname"]}`);
     saveNickname(nickname);
   });
 });

@@ -82,7 +82,6 @@ socket.on("goodbye", (nickname) => {
 
 socket.on("sendMessage", sendMessage);
 
-// 방 변경 사항 받기
 socket.on("roomUpdate", (rooms) => {
   const li = openPublicRoomList.querySelector("li");
   li.innerText = `🚪 ${rooms}`;
