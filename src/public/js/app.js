@@ -1,7 +1,12 @@
 const socket = io();
 
 const myFace = document.getElementById("myFace");
+const audioMuteButton = document.getElementById("audioMute");
+const cameraOffButton = document.getElementById("cameraOff");
+
 let myStream;
+let audioOn = true;
+let cameraOn = true;
 
 async function getMedia() {
   try {
@@ -16,6 +21,35 @@ async function getMedia() {
 }
 
 getMedia();
+
+function handleAudioMute() {
+  myStream
+    .getAudioTracks()
+    .forEach((track) => (track.enabled = !track.enabled));
+  if (!audioOn) {
+    audioMuteButton.innerText = "Mute";
+    audioOn = true;
+  } else {
+    audioMuteButton.innerText = "Unmute";
+    audioOn = false;
+  }
+}
+
+function handleCameraOff() {
+  myStream
+    .getVideoTracks()
+    .forEach((track) => (track.enabled = !track.enabled));
+  if (!cameraOn) {
+    cameraOffButton.innerText = "Camera Off";
+    cameraOn = true;
+  } else {
+    cameraOffButton.innerText = "Camera On";
+    cameraOn = false;
+  }
+}
+
+audioMuteButton.addEventListener("click", handleAudioMute);
+cameraOffButton.addEventListener("click", handleCameraOff);
 
 // ********** ********** ********** //
 // ********** 텍스트 채팅 ********** //
