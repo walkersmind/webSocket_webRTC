@@ -1,5 +1,25 @@
 const socket = io();
 
+const myFace = document.getElementById("myFace");
+let myStream;
+
+async function getMedia() {
+  try {
+    myStream = await navigator.mediaDevices.getUserMedia({
+      audio: true,
+      video: true,
+    });
+    myFace.srcObject = myStream;
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+getMedia();
+
+// ********** ********** ********** //
+// ********** 텍스트 채팅 ********** //
+// ********** ********** ********** //
 const room = document.querySelector("#room");
 const roomForm = room.querySelector("form");
 const chat = document.querySelector("#chat");
@@ -24,6 +44,7 @@ function handleSendMessage(event) {
   message.value = "";
 }
 
+nicknameSet.hidden = true;
 room.hidden = true;
 chat.hidden = true;
 openPublicRoom.hidden = true;
