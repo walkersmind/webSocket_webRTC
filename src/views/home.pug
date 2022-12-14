@@ -8,7 +8,7 @@ html(lang="en")
     title Zoom
   body
     header
-      h1 Let's Chat Together!
+      h1 Live Chat Service
     main
       div#openPublicRoom
         h2 Available Rooms
@@ -30,6 +30,9 @@ html(lang="en")
         form
           input(type="text", placeholder="You can type here", required)
           button Send
+      div#video
+        h2 Video Chat
+        video#myFace(autoplay, playsinline, width="400", height="400")
 
     script(src="/socket.io/socket.io.js") 
     script(src="/public/js/app.js")
