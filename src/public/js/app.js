@@ -1,14 +1,21 @@
 const socket = io();
 
+// ********** ********** ********** //
+// ********** 영상 채팅방 입장 ********** //
+// ********** ********** ********** //
 const videRoomSelect = document.getElementById("videoRoomSelect");
 const videoRoomSelectForm = videRoomSelect.querySelector("form");
 const videoStreaming = document.getElementById("videoStreaming");
+
+let videoRoomName;
 
 videoStreaming.hidden = true;
 
 function showVideoStreaming() {
   videRoomSelect.hidden = true;
   videoStreaming.hidden = false;
+
+  makeConnection();
 }
 
 function handleVideoRoomSelect(event) {
@@ -22,10 +29,26 @@ function handleVideoRoomSelect(event) {
 
 videoRoomSelectForm.addEventListener("submit", handleVideoRoomSelect);
 
-socket.on("videoGreeting", () => {
-  console.log("Some has joined!");
+socket.on("videoGreeting", async () => {
+  const offer = await myPeerConnection.createOffer();
+  myPeerConnection.setLocalDescription(offer);
+  socket.emit("offer", offer, videoRoomName);
 });
 
+socket.on("offer", async (offer) => {
+  myPeerConnection.setRemoteDescription(offer);
+  const answer = await myPeerConnection.createAnswer(offer);
+  myPeerConnection.setLocalDescription(answer);
+  socket.emit("answer", answer, videoRoomName);
+});
+
+socket.on("answer", async (answer) => {
+  await myPeerConnection.setRemoteDescription(answer);
+});
+
+// ********** ********** ********** //
+// ********** 영상 스트리밍 ********** //
+// ********** ********** ********** //
 const myFace = document.getElementById("myFace");
 const audioMuteButton = document.getElementById("audioMute");
 const audios = document.getElementById("audios");
@@ -128,6 +151,33 @@ audioMuteButton.addEventListener("click", handleAudioMute);
 cameraOffButton.addEventListener("click", handleCameraOff);
 audios.addEventListener("input", handleAudioName);
 cameras.addEventListener("input", handleCameraName);
+
+// ********** ********** ********** //
+// ********** RTC 연결하기 ********** //
+// ********** ********** ********** //
+function makeConnection() {
+  myPeerConnection = new RTCPeerConnection();
+  myPeerConnection.addEventListener("icecandidate", handleIce);
+  myPeerConnection.addEventListener("addstream", handleAddStream);
+  myStream
+    .getTracks()
+    .forEach((track) => myPeerConnection.addTrack(track, myStream));
+}
+
+function handleIce(data) {
+  console.log("Sent Ice Candidates");
+  socket.emit("ice", data.candidate, videoRoomName);
+}
+
+function handleAddStream(data) {
+  const peerFace = document.getElementById("peerFace");
+  peerFace.srcObject = data.stream;
+}
+
+socket.on("ice", (iceCandidates) => {
+  console.log("Added Ice Candidates");
+  myPeerConnection.addIceCandidate(iceCandidates);
+});
 
 // ********** ********** ********** //
 // ********** 텍스트 채팅 ********** //
