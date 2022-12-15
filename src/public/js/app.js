@@ -43,7 +43,7 @@ socket.on("offer", async (offer) => {
 });
 
 socket.on("answer", async (answer) => {
-  await myPeerConnection.setRemoteDescription(answer);
+  myPeerConnection.setRemoteDescription(answer);
 });
 
 // ********** ********** ********** //
@@ -156,8 +156,8 @@ cameras.addEventListener("input", handleCameraName);
 async function makeConnection() {
   myPeerConnection = new RTCPeerConnection();
   myPeerConnection.addEventListener("icecandidate", handleIce);
-  myPeerConnection.addEventListener("addstream", handleAddStream);
-  await myStream
+  myPeerConnection.addEventListener("track", handleTrack);
+  myStream
     .getTracks()
     .forEach((track) => myPeerConnection.addTrack(track, myStream));
 
@@ -169,9 +169,10 @@ function handleIce(data) {
   socket.emit("ice", data.candidate, videoRoomName);
 }
 
-function handleAddStream(data) {
+function handleTrack(data) {
+  console.log("handle track");
   const peerFace = document.getElementById("peerFace");
-  peerFace.srcObject = data.stream;
+  peerFace.srcObject = data.streams[0];
 }
 
 socket.on("ice", (iceCandidates) => {
