@@ -2,17 +2,21 @@ import http from "http";
 import { Server } from "socket.io";
 import express from "express";
 import { instrument } from "@socket.io/admin-ui";
+import ejs from "ejs";
 import { createSocket } from "dgram";
 import { sendStatus } from "express/lib/response";
 
 const app = express();
 
-app.set("view engine", "pug");
+app.engine("html", require("ejs").renderFile);
+app.set("view engine", "ejs");
 app.set("views", __dirname + "/views");
 app.use("/public", express.static(__dirname + "/public"));
 
-app.get("/", (_, res) => res.render("home"));
-app.get("/*", (_, res) => res.redirect("/"));
+app.get("/", (_, res) => res.render("index.html"));
+app.get("/index.html", function (req, res) {
+  res.render(__dirname + "/views/index.html");
+});
 
 const httpServer = http.createServer(app);
 const ioServer = new Server(httpServer, {

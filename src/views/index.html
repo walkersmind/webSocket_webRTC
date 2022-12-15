@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://unpkg.com/mvp.css" />
+    <title>Zoom</title>
+  </head>
+  <body>
+    <header>
+      <h1>Live Chat Service</h1>
+    </header>
+    <main>
+      <div id="openPublicRoom">
+        <h2>Available Rooms</h2>
+        <ul>
+          <li>🚪</li>
+        </ul>
+      </div>
+      <div id="nickname">
+        <form>
+          <h2>Set a Nickname</h2>
+          <input
+            type="text"
+            placeholder="Please enter your nicknamee"
+            required
+            autofocus
+          />
+          <button>Save</button>
+        </form>
+      </div>
+      <div id="room">
+        <form>
+          <h2>Enter a Room</h2>
+          <input type="text" placeholder="Please type Room name" required />
+          <button>Enter the Room</button>
+        </form>
+      </div>
+      <div id="chat">
+        <h2>Room Name</h2>
+        <ul></ul>
+        <form>
+          <input type="text" placeholder="You can type here" required />
+          <button>Send</button>
+        </form>
+      </div>
+      <div id="videoRoomSelect">
+        <form>
+          <h2>Enter Video Room Name</h2>
+          <input type="text" palcehodler="Please select a room" required />
+          <button>Join</button>
+        </form>
+      </div>
+      <div id="videoStreaming">
+        <h2>Video Chat</h2>
+        <video
+          id="myFace"
+          autoplay
+          playsinline
+          width="400"
+          height="400"
+        ></video>
+        <select id="cameras"></select>
+        <select id="audios"></select>
+        <button id="audioMute">Mute</button>
+        <button id="cameraOff">Camera Off</button>
+      </div>
+      <div id="peerVideoStreaming">
+        <video
+          id="peerFace"
+          autoplay
+          playsinline
+          width="400"
+          height="400"
+        ></video>
+      </div>
+    </main>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/public/js/app.js"></script>
+  </body>
+</html>
