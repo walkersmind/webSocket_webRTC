@@ -1,5 +1,31 @@
 const socket = io();
 
+const videRoomSelect = document.getElementById("videoRoomSelect");
+const videoRoomSelectForm = videRoomSelect.querySelector("form");
+const videoStreaming = document.getElementById("videoStreaming");
+
+videoStreaming.hidden = true;
+
+function showVideoStreaming() {
+  videRoomSelect.hidden = true;
+  videoStreaming.hidden = false;
+}
+
+function handleVideoRoomSelect(event) {
+  event.preventDefault();
+
+  const input = videoRoomSelectForm.querySelector("input");
+  videoRoomName = input.value;
+
+  socket.emit("videoRoomSelect", videoRoomName, showVideoStreaming);
+}
+
+videoRoomSelectForm.addEventListener("submit", handleVideoRoomSelect);
+
+socket.on("videoGreeting", () => {
+  console.log("Some has joined!");
+});
+
 const myFace = document.getElementById("myFace");
 const audioMuteButton = document.getElementById("audioMute");
 const audios = document.getElementById("audios");
@@ -24,6 +50,7 @@ async function getMedia(audioId, cameraId) {
     myStream = await navigator.mediaDevices.getUserMedia(
       audioId || cameraId ? userSelectConstrains : initialConstrains
     );
+    0;
     myFace.srcObject = myStream;
   } catch (e) {
     console.log(e);
