@@ -111,8 +111,6 @@ async function getDevices() {
   }
 }
 
-getDevices();
-
 function handleAudioMute() {
   myStream
     .getAudioTracks()
@@ -155,13 +153,15 @@ cameras.addEventListener("input", handleCameraName);
 // ********** ********** ********** //
 // ********** RTC 연결하기 ********** //
 // ********** ********** ********** //
-function makeConnection() {
+async function makeConnection() {
   myPeerConnection = new RTCPeerConnection();
   myPeerConnection.addEventListener("icecandidate", handleIce);
   myPeerConnection.addEventListener("addstream", handleAddStream);
-  myStream
+  await myStream
     .getTracks()
     .forEach((track) => myPeerConnection.addTrack(track, myStream));
+
+  getDevices();
 }
 
 function handleIce(data) {
