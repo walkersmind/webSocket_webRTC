@@ -3,6 +3,7 @@ import { Server } from "socket.io";
 import express from "express";
 import { instrument } from "@socket.io/admin-ui";
 import { createSocket } from "dgram";
+import { sendStatus } from "express/lib/response";
 
 const app = express();
 
@@ -83,6 +84,10 @@ ioServer.on("connection", (socket) => {
 
   socket.on("answer", (answer, videoRoomName) => {
     socket.to(videoRoomName).emit("answer", answer);
+  });
+
+  socket.on("ice", (iceCandidates, videoRoomName) => {
+    socket.to(videoRoomName).emit("ice", iceCandidates);
   });
 });
 

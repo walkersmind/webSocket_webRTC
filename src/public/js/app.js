@@ -44,7 +44,6 @@ socket.on("offer", async (offer) => {
 
 socket.on("answer", async (answer) => {
   await myPeerConnection.setRemoteDescription(answer);
-  console.log("애ㅜㄷ");
 });
 
 // ********** ********** ********** //
@@ -158,7 +157,27 @@ cameras.addEventListener("input", handleCameraName);
 // ********** ********** ********** //
 function makeConnection() {
   myPeerConnection = new RTCPeerConnection();
+  myPeerConnection.addEventListener("icecandidate", handleIce);
+  myPeerConnection.addEventListener("addstream", handleAddStream);
+  myStream
+    .getTracks()
+    .forEach((track) => myPeerConnection.addTrack(track, myStream));
 }
+
+function handleIce(data) {
+  console.log("Sent Ice Candidates");
+  socket.emit("ice", data.candidate, videoRoomName);
+}
+
+function handleAddStream(data) {
+  const peerFace = document.getElementById("peerFace");
+  peerFace.srcObject = data.stream;
+}
+
+socket.on("ice", (iceCandidates) => {
+  console.log("Added Ice Candidates");
+  myPeerConnection.addIceCandidate(iceCandidates);
+});
 
 // ********** ********** ********** //
 // ********** 텍스트 채팅 ********** //
