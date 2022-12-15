@@ -42,7 +42,8 @@ html(lang="en")
         select#audios
         button#audioMute Mute
         button#cameraOff Camera Off
-      video#peerFace(autoplay, playsinline, width="400", height="400")
+      div#peerVideoStreaming
+        video#peerFace(autoplay, playsinline, width="400", height="400")
 
     script(src="/socket.io/socket.io.js") 
     script(src="/public/js/app.js")
