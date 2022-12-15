@@ -76,6 +76,14 @@ ioServer.on("connection", (socket) => {
     showVideoStreaming();
     socket.to(videoRoomName).emit("videoGreeting");
   });
+
+  socket.on("offer", (offer, videoRoomName) => {
+    socket.to(videoRoomName).emit("offer", offer);
+  });
+
+  socket.on("answer", (answer, videoRoomName) => {
+    socket.to(videoRoomName).emit("answer", answer);
+  });
 });
 
 httpServer.listen(8000);
