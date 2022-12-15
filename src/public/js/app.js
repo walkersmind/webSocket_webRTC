@@ -1,19 +1,56 @@
 const socket = io();
 
+const videRoomSelect = document.getElementById("videoRoomSelect");
+const videoRoomSelectForm = videRoomSelect.querySelector("form");
+const videoStreaming = document.getElementById("videoStreaming");
+
+videoStreaming.hidden = true;
+
+function showVideoStreaming() {
+  videRoomSelect.hidden = true;
+  videoStreaming.hidden = false;
+}
+
+function handleVideoRoomSelect(event) {
+  event.preventDefault();
+
+  const input = videoRoomSelectForm.querySelector("input");
+  videoRoomName = input.value;
+
+  socket.emit("videoRoomSelect", videoRoomName, showVideoStreaming);
+}
+
+videoRoomSelectForm.addEventListener("submit", handleVideoRoomSelect);
+
+socket.on("videoGreeting", () => {
+  console.log("Some has joined!");
+});
+
 const myFace = document.getElementById("myFace");
 const audioMuteButton = document.getElementById("audioMute");
+const audios = document.getElementById("audios");
 const cameraOffButton = document.getElementById("cameraOff");
+const cameras = document.getElementById("cameras");
 
 let myStream;
 let audioOn = true;
 let cameraOn = true;
 
-async function getMedia() {
+async function getMedia(audioId, cameraId) {
+  const initialConstrains = {
+    audio: true,
+    video: { facingMode: "user" },
+  };
+
+  const userSelectConstrains = {
+    audio: { deviceId: { exact: audioId } },
+    video: { deviceId: { exact: cameraId } },
+  };
   try {
-    myStream = await navigator.mediaDevices.getUserMedia({
-      audio: true,
-      video: true,
-    });
+    myStream = await navigator.mediaDevices.getUserMedia(
+      audioId || cameraId ? userSelectConstrains : initialConstrains
+    );
+    0;
     myFace.srcObject = myStream;
   } catch (e) {
     console.log(e);
@@ -21,6 +58,37 @@ async function getMedia() {
 }
 
 getMedia();
+
+async function getDevices() {
+  try {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+
+    const videoInputs = devices.filter(
+      (device) => device.kind === "videoinput"
+    );
+    const audioInputs = devices.filter(
+      (device) => device.kind === "audioinput"
+    );
+
+    const cameraOptions = videoInputs.forEach((camera) => {
+      const option = document.createElement("option");
+      option.value = camera.deviceId;
+      option.innerHTML = camera.label;
+      cameras.appendChild(option);
+    });
+
+    const audiOptions = audioInputs.forEach((audio) => {
+      const option = document.createElement("option");
+      option.value = audio.deviceId;
+      option.innerText = audio.label;
+      audios.appendChild(option);
+    });
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+getDevices();
 
 function handleAudioMute() {
   myStream
@@ -48,8 +116,18 @@ function handleCameraOff() {
   }
 }
 
+function handleAudioName() {
+  getMedia(audios.value, undefined);
+}
+
+function handleCameraName() {
+  getMedia(undefined, cameras.value);
+}
+
 audioMuteButton.addEventListener("click", handleAudioMute);
 cameraOffButton.addEventListener("click", handleCameraOff);
+audios.addEventListener("input", handleAudioName);
+cameras.addEventListener("input", handleCameraName);
 
 // ********** ********** ********** //
 // ********** 텍스트 채팅 ********** //

@@ -2,6 +2,7 @@ import http from "http";
 import { Server } from "socket.io";
 import express from "express";
 import { instrument } from "@socket.io/admin-ui";
+import { createSocket } from "dgram";
 
 const app = express();
 
@@ -68,6 +69,12 @@ ioServer.on("connection", (socket) => {
   socket.on("nickname", (nickname, saveNickname) => {
     socket["nickname"] = nickname;
     saveNickname(nickname);
+  });
+
+  socket.on("videoRoomSelect", (videoRoomName, showVideoStreaming) => {
+    socket.join(videoRoomName);
+    showVideoStreaming();
+    socket.to(videoRoomName).emit("videoGreeting");
   });
 });
 

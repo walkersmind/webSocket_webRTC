@@ -30,9 +30,16 @@ html(lang="en")
         form
           input(type="text", placeholder="You can type here", required)
           button Send
-      div#video
+      div#videoRoomSelect
+        form
+          h2 Video
+          input("type"="text", palcehodler="Please select a room", required)
+          button Join
+      div#videoStreaming
         h2 Video Chat
         video#myFace(autoplay, playsinline, width="400", height="400")
+        select#cameras
+        select#audios
         button#audioMute Mute
         button#cameraOff Camera Off
 
