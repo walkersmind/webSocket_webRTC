@@ -73,7 +73,6 @@ async function getMedia(audioId, cameraId) {
     myStream = await navigator.mediaDevices.getUserMedia(
       audioId || cameraId ? userSelectConstrains : initialConstrains
     );
-    0;
     myFace.srcObject = myStream;
   } catch (e) {
     console.log(e);
